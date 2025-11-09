@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ALAT PRAKTIKUM ARSONIK - ARDUINO & ULTRASONIK</title>
+  <style>
+    :root{
+      --bg:#e3e9f3;
+      --card:#ffffff;
+      --accent:#084c9e;
+      --accent-hover:#063b7d;
+      --muted:#6b7280;
+      --radius:14px;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html,body{height:100%;margin:0;background:var(--bg);color:#0f172a;transition:all .3s ease;}
+    .container{max-width:980px;margin:24px auto;padding:16px}
+
+    /* HERO LAYOUT */
+    .hero{
+      background:linear-gradient(180deg, rgba(8,76,158,0.08), rgba(8,76,158,0.02));
+      border-radius:var(--radius);
+      padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center;
+      box-shadow:0 8px 24px rgba(15,23,42,0.06);transition:transform .25s ease;
+    }
+    .hero:hover{transform:scale(1.005)}
+
+    .title{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+    .title h1{margin:0;font-size:26px;letter-spacing:0.2px}
+    .title p{margin:0;color:var(--muted);font-size:14px}
+
+    .logo{width:92px;height:auto;margin-bottom:6px}
+
+    /* SLIDER */
+    .slider{position:relative;overflow:hidden;border-radius:10px;max-width:100%;height:auto;}
+    .slides{display:flex;transition:transform 0.6s ease-in-out;}
+    .slides img{width:100%;border-radius:10px;flex-shrink:0;}
+
+    .dots{display:flex;justify-content:center;margin-top:8px;gap:6px;}
+    .dot{width:10px;height:10px;border-radius:50%;background:#ccc;cursor:pointer;transition:background 0.3s ease;}
+    .dot.active{background:var(--accent);}
+
+    /* BUTTONS */
+    .buttons{margin-top:6px;display:flex;flex-direction:column;gap:10px;align-items:center}
+    .btn{background:var(--accent);color:white;padding:12px 16px;border-radius:10px;text-decoration:none;display:inline-block;font-weight:700;transition:background .18s, transform .18s;width:220px;text-align:center;min-height:44px;line-height:20px}
+    .btn:hover{background:var(--accent-hover);transform:translateY(-2px)}
+
+    /* DROPDOWN */
+    .dropdown{position:relative;display:inline-block;width:220px}
+    .dropdown-content{display:none;position:relative;margin-top:10px;text-align:center}
+    .dropdown-content .subbtn{background:#0b74de;color:white;border:none;padding:10px 14px;border-radius:8px;font-weight:600;cursor:pointer;width:170px;transition:all .18s ease;min-height:40px}
+    .dropdown-content .subbtn:hover{background:#095bb4;transform:scale(1.04)}
+    .dropdown-content.show{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px;animation:fadeIn .28s ease forwards}
+
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+    /* Responsive rules for small screens */
+    @media (max-width: 760px){
+      .container{margin:12px auto;padding:12px}
+      .hero{grid-template-columns:1fr;gap:12px;padding:16px}
+      .title{align-items:center;text-align:center}
+      .logo{width:84px}
+      .title h1{font-size:22px}
+
+      .slider{max-width:320px;margin:0 auto}
+      .dots{margin-bottom:10px}
+
+      .buttons{align-items:stretch}
+      .btn{width:100%;max-width:440px}
+      .dropdown{width:100%}
+      .dropdown-content.show{flex-direction:column;align-items:stretch}
+      .dropdown-content .subbtn{width:100%;max-width:440px}
+      .btn, .dropdown-content .subbtn{padding:14px 16px;min-height:48px}
+    }
+
+    .btn:focus, .subbtn:focus{outline:3px solid rgba(8,76,158,0.18);outline-offset:2px}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <div class="title">
+        <img src="./logo_sma_queen_alfalah.png" alt="Logo SMA Queen Al Falah" class="logo" />
+        <h1>ALAT PRAKTIKUM ARSONIK</h1>
+        <p>ARDUINO dan ULTRASONIK</p>
+        <div class="slider" id="slider">
+          <div class="slides">
+            <img src="alat1.png" alt="Alat 1">
+            <img src="alat2.png" alt="Alat 2">
+            <img src="alat3.png" alt="Alat 3">
+            <img src="alat4.png" alt="Alat 4">
+            <img src="alat5.png" alt="Alat 5">
+          </div>
+        </div>
+        <div class="dots" id="dots"></div>
+      </div>
+
+      <div class="buttons" role="navigation" aria-label="Tombol navigasi alat praktikum">
+        <a class="btn" href="https://drive.google.com/drive/u/0/folders/1vY8RvVr8Q01sQnybNNL1lN1zyE5RjTim">Modul Praktikum</a>
+        <a class="btn" href="https://www.arduino.cc/en/software/">Download Arduino IDE</a>
+        <a class="btn" href="https://www.youtube.com/watch?v=P988M44U9Ww">Cara Install Arduino</a>
+        <a class="btn" href="https://www.youtube.com/watch?v=2k0FdXMJJSE&pp=ygUXY2FyYSB1cGxvZCBhcmR1aW5vIGlkZSA%3D">Cara Upload Coding Arduino</a>
+
+        <div class="dropdown">
+          <button class="btn" id="dropdownBtn" aria-expanded="false" aria-controls="dropdownMenu">Pilihan Alat Praktikum</button>
+          <div class="dropdown-content" id="dropdownMenu" role="menu" aria-hidden="true">
+            <button class="subbtn" onclick="window.location.href='https://drive.google.com/drive/u/0/folders/1nA02uVpiJh25VEGZfQ-CLNlnD4zJ1laq'">Alat 1 - Ultrasonik & LED</button>
+            <button class="subbtn" onclick="window.location.href='https://drive.google.com/drive/u/0/folders/14liD6dqGDxDyx6FsOCD4xA_OIgGORdwB'">Alat 2 - Ultrasonik & LCD</button>
+            <button class="subbtn" onclick="window.location.href='https://drive.google.com/drive/u/0/folders/1h5pseZzgLY3Cn1VFWXrmQ6XFwvE4p4ox'">Alat 3 - Ultrasonik & Relay Lampu</button>
+            <button class="subbtn" onclick="window.location.href='https://drive.google.com/drive/u/0/folders/1tO7p2F0TlT5nKx6qJv1INHE4TV6gmeDp'">Alat 4 - Ultrasonik & Servo</button>
+            <button class="subbtn" onclick="window.location.href='https://drive.google.com/drive/u/0/folders/1q7qgA0cCMDaQGpn31M41m0_zWs2uLLlk'">Alat 5 - Ultrasonik & Buzzer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section style="margin-top:18px;text-align:left">
+      <h3 style="margin-bottom:6px">Deskripsi Singkat</h3>
+      <p style="color:var(--muted);max-width:820px">Alat praktikum ini menggunakan modul ultrasonik yang dikendalikan oleh mikrokontroler Arduino untuk mengukur jarak dan memperagakan konsep besar-besaran gelombang. Halaman ini berfungsi sebagai landing page sederhana untuk dokumentasi dan tampilan alat.</p>
+    </section>
+  </div>
+
+  <script>
+    const dropdownBtn = document.getElementById('dropdownBtn');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+
+    dropdownBtn.addEventListener('click', () => {
+      const shown = dropdownMenu.classList.toggle('show');
+      dropdownBtn.setAttribute('aria-expanded', shown);
+      dropdownMenu.setAttribute('aria-hidden', !shown);
+    });
+
+    document.addEventListener('click', (e) => {
+      const target = e.target;
+      if (!dropdownBtn.contains(target) && !dropdownMenu.contains(target)) {
+        if (dropdownMenu.classList.contains('show')) {
+          dropdownMenu.classList.remove('show');
+          dropdownBtn.setAttribute('aria-expanded', 'false');
+          dropdownMenu.setAttribute('aria-hidden', 'true');
+        }
+      }
+    });
+
+    // SLIDER SCRIPT
+    const slides = document.querySelector('.slides');
+    const images = document.querySelectorAll('.slides img');
+    const dotsContainer = document.getElementById('dots');
+
+    let index = 0;
+    let interval;
+
+    images.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.classList.add('dot');
+      dot.addEventListener('click', () => moveToSlide(i));
+      dotsContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll('.dot');
+
+    function moveToSlide(i){
+      index = i;
+      updateSlider();
+      resetInterval();
+    }
+
+    function updateSlider(){
+      slides.style.transform = `translateX(-${index * 100}%)`;
+      dots.forEach(dot => dot.classList.remove('active'));
+      dots[index].classList.add('active');
+    }
+
+    function nextSlide(){
+      index = (index + 1) % images.length;
+      updateSlider();
+    }
+
+    function resetInterval(){
+      clearInterval(interval);
+      interval = setInterval(nextSlide, 3000);
+    }
+
+    updateSlider();
+    interval = setInterval(nextSlide, 3000);
+
+    // swipe gesture for mobile
+    let startX = 0;
+    slides.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+    slides.addEventListener('touchend', e => {
+      let diff = e.changedTouches[0].clientX - startX;
+      if(diff > 50){index = (index - 1 + images.length) % images.length; updateSlider(); resetInterval();}
+      else if(diff < -50){index = (index + 1) % images.length; updateSlider(); resetInterval();}
+    });
+  </script>
+</body>
+</html>
